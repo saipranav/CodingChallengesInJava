@@ -1,15 +1,11 @@
 package Graphs;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Created by Sai Pranav on 12/26/2016.
+ * Created by Sai Pranav on 12/27/2016.
  */
-/* Always maintains complete binary tree */
-public class BinaryTree<T> {
+public class BinarySearchTree<T> {
   class BinaryTreeNode<T> {
     T data;
     BinaryTreeNode<T>[] children;
@@ -17,75 +13,58 @@ public class BinaryTree<T> {
 
     BinaryTreeNode(T data){
       this.data = data;
-      children = new BinaryTreeNode[2];
-      parent = null;
+      this.children = new BinaryTreeNode[2];
+      this.parent = null;
     }
   }
 
   private BinaryTreeNode<T> root;
   private Set<BinaryTreeNode<T>> visited;
   private int maxChildrenPerNode = 2;
+  private Comparator<T> comparator;
 
-  public BinaryTree(){
+  public BinarySearchTree(Comparator<T> comparator){
     this.root = null;
     this.visited = new HashSet<BinaryTreeNode<T>>();
+    this.comparator = comparator;
   }
 
   public void insert(T data){
-    BinaryTreeNode<T> newParent = findBestPlaceToInsert();
-    BinaryTreeNode<T> newChild = new BinaryTreeNode<T>(data);
-    if(newParent == null){
+    BinaryTreeNode<T> newParent = findBestPlaceToInsert(root, data);
+    BinaryTreeNode<T> newChild = new BinaryTreeNode(data);
+
+    if(newParent == null && root == null){
       root = newChild;
     } else {
-      if(newParent.children[0] == null){
-        newParent.children[0] = newChild;
-      } else {
+      int compareResult = comparator.compare(data, newParent.data);
+      if(compareResult >= 0){
         newParent.children[1] = newChild;
+      } else {
+        newParent.children[0] =newChild;
       }
       newChild.parent = newParent;
     }
   }
 
   public Boolean contains(T data){
-    return contains(data, Traversal.BREDTH_FIRST);
-  }
-
-  public Boolean contains(T key, Traversal traversalType){
-    BinaryTreeNode returnableNode;
-    switch(traversalType){
-      case INORDER:{
-        returnableNode = findNodeByInOrder(root, key);
-        break;
-      }
-      case BREDTH_FIRST: default:{
-        returnableNode = findNodeByBreadthFirst(root, key);
-        break;
-      }
-    }
-    if(returnableNode == null){
+    if(root == null){
       return false;
-    } else {
+    }
+
+    BinaryTreeNode returnableNode = findNode(root, data);
+    if(returnableNode != null){
       return true;
     }
+    return false;
   }
 
   public void delete(T data) throws NodeNotFoundException{
-    BinaryTreeNode toBeDeleted = findNodeByInOrder(root, data);
+    BinaryTreeNode toBeDeleted = findNode(root, data);
     if(toBeDeleted == null){
       throw new NodeNotFoundException("Node to be deleted is not found");
     }
 
-    BinaryTreeNode swappableLeaf = findBestLeafToSwap(root, data);
-    if(swappableLeaf == null){
-      if(root == null){
-        // This must not happen as we have something to delete but nothing to swap
-        return;
-      }
-      swappableLeaf = root;
-    }
-
-    BinaryTreeNode rightMostLeaf = findRightMostLeaf(root);
-    if(rightMostLeaf == toBeDeleted){
+    if(numberOfChildren(toBeDeleted) == 0){
       for(int index = 0; index < maxChildrenPerNode; index++){
         if( toBeDeleted.parent.children[index] == toBeDeleted){
           toBeDeleted.parent.children[index] = null;
@@ -98,6 +77,14 @@ public class BinaryTree<T> {
         root = null;
       }
     } else {
+      BinaryTreeNode swappableLeaf = findBestLeafToSwap(toBeDeleted);
+      if(swappableLeaf == null){
+        if(root == null){
+          // This must not happen as we have something to delete but nothing from root
+          return;
+        }
+        swappableLeaf = root;
+      }
       toBeDeleted.data = swappableLeaf.data;
       for(int index = 0; index < maxChildrenPerNode; index++){
         if( swappableLeaf.parent.children[index] == swappableLeaf){
@@ -107,6 +94,10 @@ public class BinaryTree<T> {
       swappableLeaf.data = null;
       swappableLeaf.children = null;
       swappableLeaf.parent = null;
+
+      BinaryTreeNode swappedNode = toBeDeleted;
+
+      satisfyBinarySearchTree(swappedNode);
     }
   }
 
@@ -129,6 +120,36 @@ public class BinaryTree<T> {
         System.out.println();
         break;
     }
+  }
+
+  private BinaryTreeNode findBestPlaceToInsert(BinaryTreeNode<T> node ,T data){
+    if(node == null){
+      return null;
+    }
+
+    int compareResult = comparator.compare(data, node.data);
+    BinaryTreeNode returnableNode = null;
+
+    if(compareResult >= 0){
+      if(node.children[1] == null){
+        return node;
+      } else{
+        returnableNode = findBestPlaceToInsert(node.children[1], data);
+        if (returnableNode != null) {
+          return returnableNode;
+        }
+      }
+    } else {
+      if(node.children[0] == null){
+        return node;
+      } else {
+        returnableNode = findBestPlaceToInsert(node.children[0], data);
+        if(returnableNode != null){
+          return returnableNode;
+        }
+      }
+    }
+    return null;
   }
 
   private void inOrderTraversal(BinaryTreeNode<T> node){
@@ -178,93 +199,69 @@ public class BinaryTree<T> {
     }
   }
 
-  private BinaryTreeNode findBestPlaceToInsert() {
-    if(root == null){
-      return null;
-    }
-    // Do breadth first search and insert the node
-    Queue<BinaryTreeNode<T>> queue = new LinkedList<BinaryTreeNode<T>>();
-    queue.add(root);
-
-    while(queue.isEmpty() == false){
-      BinaryTreeNode<T> currentNode = queue.remove();
-      if (isVisited(currentNode) == false && numberOfChildren(currentNode) < maxChildrenPerNode){
-        clearVisited();
-        return currentNode;
-      }
-      for( int index = 0; index < currentNode.children.length; index++){
-        if(currentNode.children[index] != null){
-          queue.add(currentNode.children[index]);
-        }
-      }
-      setVisited(currentNode);
-    }
-    // It is a perfect tree as of now
-
-    // Below return null should never occur as
-    // there will be some leaf node which does
-    // not have children at full capacity
-    // for example left most leaf node
-    clearVisited();
-    return null;
-  }
-
-  private BinaryTreeNode findBestLeafToSwap(BinaryTreeNode<T> node, T key){
+  private BinaryTreeNode findNode(BinaryTreeNode<T> node, T key){
     if(node == null){
       return null;
     }
-    if(numberOfChildren(node) == 0 && !(node.data.equals(key)) ){
+
+    int compareResult = comparator.compare(key, node.data);
+    BinaryTreeNode returnableNode = null;
+
+    if(compareResult > 0){
+      returnableNode = findNode(node.children[1], key);
+    } else if(compareResult < 0){
+      returnableNode = findNode(node.children[0], key);
+    } else {
       return node;
     }
-    BinaryTreeNode returnableNode;
-    returnableNode = findBestLeafToSwap(node.children[1], key);
-    if(returnableNode != null){
-      return returnableNode;
-    }
-    returnableNode = findBestLeafToSwap(node.children[0], key);
-    if(returnableNode != null){
-      return returnableNode;
-    }
-    return null;
+    return returnableNode;
   }
 
-  private BinaryTreeNode findNodeByInOrder(BinaryTreeNode<T> node, T key){
+  private void satisfyBinarySearchTree(BinaryTreeNode<T> node){
+    BinaryTreeNode<T> currentNode = node;
+    while(currentNode != null){
+      if(currentNode.children[0] != null){
+        int compareResult = comparator.compare(currentNode.data, currentNode.children[0].data);
+        if(compareResult >= 0){
+          // no problem
+        } else {
+          T temp = currentNode.data;
+          currentNode.data = currentNode.children[0].data;
+          currentNode.children[0].data = temp;
+          currentNode = currentNode.children[0];
+          // continue to skip next if for checking right node
+          continue;
+        }
+      }
+      if(currentNode.children[1] != null){
+        int compareResult = comparator.compare(currentNode.data, currentNode.children[1].data);
+        if(compareResult >= 0){
+          T temp = currentNode.data;
+          currentNode.data = currentNode.children[0].data;
+          currentNode.children[0].data = temp;
+          currentNode = currentNode.children[0];
+        } else {
+          // no problem
+          currentNode = null;
+        }
+      }
+    }
+  }
+
+  private BinaryTreeNode findBestLeafToSwap(BinaryTreeNode<T> node){
     if(node == null){
       return null;
     }
     BinaryTreeNode returnableNode;
-    returnableNode = findNodeByInOrder(node.children[0], key);
+    returnableNode = findLeftMostLeaf(node.children[1]);
     if(returnableNode != null){
       return returnableNode;
     }
-    if(node.data.equals(key)){
-      return node;
-    }
-    returnableNode = findNodeByInOrder(node.children[1], key);
+    returnableNode = findRightMostLeaf(node.children[0]);
     if(returnableNode != null){
       return returnableNode;
     }
-    return null;
-  }
 
-  private BinaryTreeNode findNodeByBreadthFirst(BinaryTreeNode<T> node, T key){
-    if (node == null){
-      return null;
-    }
-
-    Queue<BinaryTreeNode<T>> queue = new LinkedList<BinaryTreeNode<T>>();
-    queue.add(node);
-    while(queue.isEmpty() == false){
-      BinaryTreeNode currentNode = queue.remove();
-      if(currentNode.data.equals(key)){
-        return currentNode;
-      }
-      for(int index = 0; index < maxChildrenPerNode; index++){
-        if(currentNode.children[index] != null){
-          queue.add(currentNode.children[index]);
-        }
-      }
-    }
     return null;
   }
 
