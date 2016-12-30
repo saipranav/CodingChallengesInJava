@@ -20,7 +20,7 @@ public class BinaryTree {
     tree.traverse(Traversal.PREORDER);
     tree.traverse(Traversal.POSTORDER);
     tree.traverse(Traversal.BREDTH_FIRST);
-    System.out.println(tree.contains(4));
+    /*System.out.println(tree.contains(4));
     System.out.println(tree.contains(8));
     try{
       tree.delete(7);
@@ -28,5 +28,7 @@ public class BinaryTree {
       System.out.println(e);
     }
     tree.traverse(Traversal.INORDER);
+    System.out.println(tree.height());
+    System.out.println(tree.diameter());*/
   }
 }

@@ -1,26 +1,12 @@
 package Graphs;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Sai Pranav on 12/26/2016.
  */
 /* Always maintains complete binary tree */
 public class BinaryTree<T> {
-  class BinaryTreeNode<T> {
-    T data;
-    BinaryTreeNode<T>[] children;
-    BinaryTreeNode<T> parent;
-
-    BinaryTreeNode(T data){
-      this.data = data;
-      children = new BinaryTreeNode[2];
-      parent = null;
-    }
-  }
 
   private BinaryTreeNode<T> root;
   private Set<BinaryTreeNode<T>> visited;
@@ -115,6 +101,8 @@ public class BinaryTree<T> {
       case INORDER:
         inOrderTraversal(root);
         System.out.println();
+        /*inOrderTraversalUsingStack(root);
+        System.out.println();*/
         break;
       case PREORDER:
         preOrderTraversal(root);
@@ -131,6 +119,33 @@ public class BinaryTree<T> {
     }
   }
 
+  public int height(){
+    return calcHeight(root);
+  }
+
+  private int calcHeight(BinaryTreeNode<T> node){
+    if(node == null){
+      return 0;
+    }
+
+    return 1 + Math.max( calcHeight(node.children[0]), calcHeight(node.children[1]) );
+  }
+
+  public int diameter(){
+    return calcDiameter(root);
+  }
+
+  private int calcDiameter(BinaryTreeNode<T> node){
+    if(node == null){
+      return 0;
+    }
+
+    int totalHeight = 1 + calcHeight(node.children[0]) + calcHeight(node.children[1]);
+    int leftDiameter = calcDiameter(node.children[0]);
+    int rightDiameter = calcDiameter(node.children[1]);
+    return Math.max(totalHeight, Math.max(leftDiameter, rightDiameter));
+  }
+
   private void inOrderTraversal(BinaryTreeNode<T> node){
     if(node == null){
       return;
@@ -139,6 +154,31 @@ public class BinaryTree<T> {
     inOrderTraversal(node.children[0]);
     System.out.print(" [ "+node.data.toString()+" ] ");
     inOrderTraversal(node.children[1]);
+  }
+
+  private void inOrderTraversalUsingStack(BinaryTreeNode<T> node){
+    if(node == null){
+      return;
+    }
+    Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
+    BinaryTreeNode<T> currentNode = node;
+
+    while(currentNode != null){
+      stack.push(currentNode);
+      currentNode = currentNode.children[0];
+    }
+
+    while(stack.isEmpty() == false){
+      currentNode = stack.pop();
+      System.out.print(" [ " + currentNode.data + " ] ");
+      if(currentNode.children[1] != null){
+        currentNode = currentNode.children[1];
+        while(currentNode != null){
+          stack.push(currentNode);
+          currentNode = currentNode.children[0];
+        }
+      }
+    }
   }
 
   private void preOrderTraversal(BinaryTreeNode<T> node){

@@ -6,17 +6,6 @@ import java.util.*;
  * Created by Sai Pranav on 12/27/2016.
  */
 public class BinarySearchTree<T> {
-  class BinaryTreeNode<T> {
-    T data;
-    BinaryTreeNode<T>[] children;
-    BinaryTreeNode<T> parent;
-
-    BinaryTreeNode(T data){
-      this.data = data;
-      this.children = new BinaryTreeNode[2];
-      this.parent = null;
-    }
-  }
 
   private BinaryTreeNode<T> root;
   private Set<BinaryTreeNode<T>> visited;
@@ -27,6 +16,14 @@ public class BinarySearchTree<T> {
     this.root = null;
     this.visited = new HashSet<BinaryTreeNode<T>>();
     this.comparator = comparator;
+  }
+
+  public BinaryTreeNode<T> getRoot(){
+    return root;
+  }
+
+  public Comparator<T> getComparator(){
+    return comparator;
   }
 
   public void insert(T data){
@@ -120,6 +117,40 @@ public class BinarySearchTree<T> {
         System.out.println();
         break;
     }
+  }
+
+  public boolean isBST(){
+    if(root == null){
+      return true;
+    }
+
+    Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
+    BinaryTreeNode<T> currentNode = root;
+    BinaryTreeNode<T> prev = root;
+
+    while(currentNode.children[0] != null){
+      stack.push(currentNode);
+      currentNode = currentNode.children[0];
+    }
+
+    while(stack.isEmpty() == false){
+      prev = currentNode;
+      currentNode = stack.pop();
+      int compareResult = comparator.compare(prev.data, currentNode.data);
+      if(compareResult > 0){
+        return false;
+      }
+      BinaryTreeNode<T> temp = currentNode;
+      if(temp.children[1] != null){
+        temp = temp.children[1];
+        stack.push(temp);
+        while(temp.children[0] != null){
+          temp = temp.children[0];
+          stack.push(temp);
+        }
+      }
+    }
+    return true;
   }
 
   private BinaryTreeNode findBestPlaceToInsert(BinaryTreeNode<T> node ,T data){
