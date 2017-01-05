@@ -1,4 +1,4 @@
-package Graphs;
+package Trees;
 
 import java.util.*;
 

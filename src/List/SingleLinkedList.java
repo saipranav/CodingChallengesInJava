@@ -7,6 +7,7 @@ public class SingleLinkedList<E> {
   Node<E> head;
   Node<E> tail;
   int size;
+  public Node<E> currentTemp;
 
   public class Node<E> {
     E data;
@@ -52,6 +53,23 @@ public class SingleLinkedList<E> {
       runner = runner.next;
     }
     return found;
+  }
+
+  public E getNext(){
+    Node<E> temp = currentTemp;
+    if(currentTemp == null){
+      return null;
+    }
+    currentTemp = currentTemp.next;
+    return temp.data;
+  }
+
+  public int getSize(){
+    return size;
+  }
+
+  public void resetPointers(){
+    currentTemp = head;
   }
 
   public void print(){

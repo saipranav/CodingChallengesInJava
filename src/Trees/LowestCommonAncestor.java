@@ -1,6 +1,4 @@
-package Graphs;
-
-import Graphs.test.*;
+package Trees;
 
 import java.util.Comparator;
 import java.util.HashSet;

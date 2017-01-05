@@ -1,4 +1,4 @@
-package Graphs.test;
+package Trees.Test;
 
 import java.util.Comparator;
 

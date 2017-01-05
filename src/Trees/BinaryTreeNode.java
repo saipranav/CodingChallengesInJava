@@ -1,4 +1,4 @@
-package Graphs;
+package Trees;
 
 /**
  * Created by Sai Pranav on 12/29/2016.

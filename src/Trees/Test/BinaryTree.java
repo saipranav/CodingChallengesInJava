@@ -1,14 +1,13 @@
-package Graphs.test;
+package Trees.Test;
 
-import Graphs.NodeNotFoundException;
-import Graphs.Traversal;
+import Trees.Traversal;
 
 /**
  * Created by Sai Pranav on 12/26/2016.
  */
 public class BinaryTree {
   public static void main(String args[]){
-    Graphs.BinaryTree<Integer> tree = new Graphs.BinaryTree<Integer>();
+    Trees.BinaryTree<Integer> tree = new Trees.BinaryTree<Integer>();
     tree.insert(1);
     tree.insert(2);
     tree.insert(3);
