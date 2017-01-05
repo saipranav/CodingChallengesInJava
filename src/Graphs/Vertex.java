@@ -1,9 +1,6 @@
 package Graphs;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Sai Pranav on 1/3/2017.
@@ -11,10 +8,12 @@ import java.util.Set;
 public class Vertex {
   public String label;
   public List<Edge> edges;
+  public Map<String, Object> property;
 
   public Vertex(String label){
     this.label = label;
     this.edges = new ArrayList<Edge>();
+    this.property = new HashMap<String, Object>();
   }
 
   public boolean addEdge(Edge edge){
@@ -62,6 +61,18 @@ public class Vertex {
       }
     }
     return false;
+  }
+
+  public void addProperty(String key, Object value){
+    this.property.put(key, value);
+  }
+
+  public Object getProperty(String key){
+    return this.property.get(key);
+  }
+
+  public void resetProperties(){
+    this.property.clear();
   }
 
   public Set<String> getNeighbours(){

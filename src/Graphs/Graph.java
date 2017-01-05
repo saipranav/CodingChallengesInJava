@@ -105,15 +105,17 @@ public class Graph {
 
     while(queue.isEmpty() == false){
       Vertex vertex = vertices.get( queue.remove() );
-      if(visited.contains(vertex.label) == false){
-        Set<String> neighbours = vertex.getNeighbours();
-        for (String neighbour : neighbours){
-          System.out.print(vertex.label + " -> " + neighbour + " | ");
+      Set<String> neighbours = vertex.getNeighbours();
+      for (String neighbour : neighbours){
+        System.out.print(vertex.label + " -> " + neighbour + " | ");
+        if(visited.contains(neighbour) == false){
           queue.add(neighbour);
         }
-        System.out.println();
-        visited.add(vertex.label);
       }
+      if(neighbours.size() > 0){
+        System.out.println();
+      }
+      visited.add(vertex.label);
     }
   }
 
@@ -135,7 +137,9 @@ public class Graph {
           System.out.print(vertex.label + " -> " + neighbour + " | ");
           stack.push(neighbour);
         }
-        System.out.println();
+        if(neighbours.size() > 0){
+          System.out.println();
+        }
         visited.add(vertex.label);
       }
     }

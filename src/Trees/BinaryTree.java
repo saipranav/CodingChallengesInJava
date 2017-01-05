@@ -163,20 +163,18 @@ public class BinaryTree<T> {
     Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
     BinaryTreeNode<T> currentNode = node;
 
-    while(currentNode != null){
-      stack.push(currentNode);
-      currentNode = currentNode.children[0];
-    }
-
-    while(stack.isEmpty() == false){
+    while(true){
+      while(currentNode != null){
+        stack.push(currentNode);
+        currentNode = currentNode.children[0];
+      }
+      if(stack.isEmpty() == true){
+        break;
+      }
       currentNode = stack.pop();
       System.out.print(" [ " + currentNode.data + " ] ");
       if(currentNode.children[1] != null){
         currentNode = currentNode.children[1];
-        while(currentNode != null){
-          stack.push(currentNode);
-          currentNode = currentNode.children[0];
-        }
       }
     }
   }
