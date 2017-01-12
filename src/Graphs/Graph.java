@@ -47,30 +47,20 @@ public class Graph {
 
   // O(E) searches in edge lists for duplicate edges
   public void addEdge(String start, String edgeLabel, double value, String end) {
-    Vertex newStart;
-    Edge newEdge = new Edge(start, edgeLabel, value, end);
-
-    if (vertices.containsKey(start)) {
-      newStart = vertices.get(start);
-    } else {
-      newStart = new Vertex(start);
-      vertices.put(start, newStart);
-      if (vertices.containsKey(end) == false) {
-        vertices.put(end, new Vertex(end));
-      }
+    if (vertices.containsKey(start) == false) {
+      vertices.put(start, new Vertex(start));
     }
+    if (vertices.containsKey(end) == false) {
+      vertices.put(end, new Vertex(end));
+    }
+
+    Edge newEdge = new Edge(start, edgeLabel, value, end);
+    Vertex newStart = vertices.get(start);
     newStart.addEdge(newEdge);
 
     if (isDirected == false) {
-      Vertex newStartReverse;
       Edge newEdgeReverse = new Edge(end, edgeLabel, value, start);
-
-      if (vertices.containsKey(end)) {
-        newStartReverse = vertices.get(end);
-      } else {
-        newStartReverse = new Vertex(end);
-        vertices.put(end, newStartReverse);
-      }
+      Vertex newStartReverse = vertices.get(end);
       newStartReverse.addEdge(newEdgeReverse);
     }
   }
